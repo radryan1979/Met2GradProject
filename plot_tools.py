@@ -276,3 +276,42 @@ def plot_geopotential_contours(Z, time_idx=0, level_value=50000, cmap='viridis',
     ax.set_title(f"Geopotential Height at {int(level_value/100)} hPa\nTime: {str(Z.time[time_idx].values)[:10]}")
     plt.tight_layout()
     plt.show()
+
+def plot_eof(eof_da, title=None, cmap='RdBu_r', prj='PlateCarree'):
+    """
+    Plot streamlines from U and V wind components at a specific time and pressure level.
+
+    Parameters:
+    -----------
+    eof_da : xarray.DataArray
+        Xarray DataArray with the EOFS
+    title : text
+        Title for the plot.
+    cmap : text
+        Matplotlib CMAP
+    prj : text
+        Select either PlateCarree or SouthPolarStereo for plot projection
+    """
+    
+    if prj == 'PlateCarree':
+        proj = ccrs.PlateCarree()
+    elif prj == 'SouthPolarStereo':
+        proj = ccrs.SouthPolarStereo()
+        
+    fig = plt.figure(figsize=(10, 5))
+    ax = plt.axes(projection=proj)
+    ax.set_global()
+    ax.set_extent([-180, 180, -90, -45], ccrs.PlateCarree())
+    ax.coastlines()
+    ax.add_feature(cfeature.BORDERS, linewidth=0.5)
+
+    im = eof_da.plot(
+        ax=ax,
+        transform=ccrs.PlateCarree(),
+        cmap=cmap,
+        cbar_kwargs={'label': 'EOF amplitude'},
+    )
+
+    ax.set_title(title or eof_da.name)
+    plt.tight_layout()
+    plt.show()
