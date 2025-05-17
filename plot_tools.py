@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCarree'):
+def plot_field(field, title, time_idx, level_value, save_file=None, cmap='viridis', prj='PlateCarree'):
     """Plot a horizontal map of a 3D field at given time and level.
 
     Parameters:
@@ -24,6 +24,8 @@ def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCa
         Index of time step to plot, -1 if there is no time coordinate
     level_value : float
         Pressure level to plot (in Pa)
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only.
     cmap : text
         Matplotlib CMAP choice
     prj : text
@@ -58,9 +60,13 @@ def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCa
     elif time_idx >= 0:
         ax.set_title(f"{title} at {int(level_value/100)} hPa, time: {str(field.time[time_idx].values)[:10]}")
 
-    plt.show()
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
+    
 
-def plot_wind_barbs(U, V, time_idx=0, level_value=85000, stride=5, prj='PlateCarree'):
+def plot_wind_barbs(U, V, save_file=None, time_idx=0, level_value=85000, stride=5, prj='PlateCarree'):
     """
     Plot wind barbs from U and V wind components at a given time and pressure level.
 
@@ -68,6 +74,8 @@ def plot_wind_barbs(U, V, time_idx=0, level_value=85000, stride=5, prj='PlateCar
     -----------
     U, V : xarray.DataArray
         Wind components with dims ('time', 'plev', 'lat', 'lon')
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only
     time_idx : int
         Index of time step to plot
     level_value : float
@@ -128,9 +136,12 @@ def plot_wind_barbs(U, V, time_idx=0, level_value=85000, stride=5, prj='PlateCar
         transform=ccrs.PlateCarree(),
     )
 
-    plt.show()
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
 
-def plot_wind_streamlines(U, V, time_idx=0, level_value=85000, density=2, prj='PlateCarree'):
+def plot_wind_streamlines(U, V, save_file=None, time_idx=0, level_value=85000, density=2, prj='PlateCarree'):
     """
     Plot streamlines from U and V wind components at a specific time and pressure level.
 
@@ -138,6 +149,8 @@ def plot_wind_streamlines(U, V, time_idx=0, level_value=85000, density=2, prj='P
     -----------
     U, V : xarray.DataArray
         Wind components with dims ('time', 'plev', 'lat', 'lon')
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only
     time_idx : int
         Index of time step to plot
     level_value : float
@@ -199,9 +212,13 @@ def plot_wind_streamlines(U, V, time_idx=0, level_value=85000, density=2, prj='P
     )
 
     plt.tight_layout()
-    plt.show()
+    
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
 
-def plot_geopotential_contours(Z, time_idx=0, level_value=50000, cmap='viridis', prj='PlateCarree'):
+def plot_geopotential_contours(Z, save_file=None, time_idx=0, level_value=50000, cmap='viridis', prj='PlateCarree'):
     """
     Plot geopotential height contours from CMIP5 data.
 
@@ -209,6 +226,8 @@ def plot_geopotential_contours(Z, time_idx=0, level_value=50000, cmap='viridis',
     -----------
     Z : xarray.DataArray
         Geopotential (m^2/s^2) with dims ('time', 'plev', 'lat', 'lon')
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only
     time_idx : int
         Index of time to plot
     level_value : float
@@ -286,9 +305,13 @@ def plot_geopotential_contours(Z, time_idx=0, level_value=50000, cmap='viridis',
     
     ax.set_title(f"Geopotential Height at {int(level_value/100)} hPa\nTime: {str(Z.time[time_idx].values)[:10]}")
     plt.tight_layout()
-    plt.show()
+    
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
 
-def plot_eof(eof_da, title=None, cmap='RdBu_r', prj='PlateCarree'):
+def plot_eof(eof_da, save_file=None, title=None, cmap='RdBu_r', prj='PlateCarree'):
     """
     Plot streamlines from U and V wind components at a specific time and pressure level.
 
@@ -296,6 +319,8 @@ def plot_eof(eof_da, title=None, cmap='RdBu_r', prj='PlateCarree'):
     -----------
     eof_da : xarray.DataArray
         Xarray DataArray with the EOFS
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only
     title : text
         Title for the plot.
     cmap : text
@@ -325,9 +350,13 @@ def plot_eof(eof_da, title=None, cmap='RdBu_r', prj='PlateCarree'):
 
     ax.set_title(title or eof_da.name)
     plt.tight_layout()
-    plt.show()
+    
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
 
-def plot_eofs_panel(eof_da, pca, fig_title, num_modes=4, cmap='RdBu_r', prj='PlateCarree'):
+def plot_eofs_panel(eof_da, pca, fig_title, save_file=None, num_modes=4, cmap='RdBu_r', prj='PlateCarree'):
     """
     Plot the first N EOFs in a panel with subplots and a shared colorbar at the bottom.
 
@@ -339,6 +368,8 @@ def plot_eofs_panel(eof_da, pca, fig_title, num_modes=4, cmap='RdBu_r', prj='Pla
         List of DataArrays with a PCA mode mode dimension (e.g., shape = (mode, lat, lon))
     fig_title : text
         Title for the figure
+    save_file : text
+        Path and file name string to save plot, if None, plot is displayed only
     num_modes : int
         Number of EOFs to plot (from mode 0 to num_modes-1).
     cmap : str
@@ -392,4 +423,8 @@ def plot_eofs_panel(eof_da, pca, fig_title, num_modes=4, cmap='RdBu_r', prj='Pla
     plt.tight_layout(rect=[0, 0.1, 1, 0.95])
 
     plt.tight_layout(rect=[0, 0.1, 1, 1])  # Adjust for colorbar space
-    plt.show()
+    
+    if save_file is None:
+        plt.show()
+    else:    
+        plt.savefil(save_file)
