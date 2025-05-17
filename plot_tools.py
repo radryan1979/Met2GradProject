@@ -1,10 +1,13 @@
+# A set of plotting functions for QGPV analysis of CMIP data
+# particularly for the Southern Hemisphere
+# Author: Ryan Eagan - May 2025
+
 import xarray as xr
 import numpy as np
 import metpy.calc as mpcalc
 from metpy.units import units
 from os import path
 import matplotlib.pyplot as plt
-from pyproj import Proj, Transformer
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
@@ -18,7 +21,7 @@ def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCa
     title : text
         The name of the field for the plot title
     time_idx : int
-        Index of time step to plot
+        Index of time step to plot, -1 if there is no time coordinate
     level_value : float
         Pressure level to plot (in Pa)
     cmap : text
@@ -26,8 +29,12 @@ def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCa
     prj : text
         Select either PlateCarree or SouthPolarStereo for plot projection
     """
-    # Select the data slice
-    field_sel = field.sel(time=field.time[time_idx], plev=level_value, method="nearest")
+    
+    if time_idx < 0:
+        field_sel = field.sel(plev=level_value, method="nearest")
+    elif time_idx >= 0:
+        # Select the data slice
+        field_sel = field.sel(time=field.time[time_idx], plev=level_value, method="nearest")
 
     if prj == 'PlateCarree':
         proj = ccrs.PlateCarree()
@@ -46,7 +53,11 @@ def plot_field(field, title, time_idx, level_value, cmap='viridis', prj='PlateCa
     
     ax.coastlines()
     ax.add_feature(cfeature.BORDERS, linewidth=0.5)
-    ax.set_title(f"{title} at {int(level_value/100)} hPa, time: {str(field.time[time_idx].values)[:10]}")
+    if time_idx < 0:
+            ax.set_title(f"{title} at {int(level_value/100)} hPa")
+    elif time_idx >= 0:
+        ax.set_title(f"{title} at {int(level_value/100)} hPa, time: {str(field.time[time_idx].values)[:10]}")
+
     plt.show()
 
 def plot_wind_barbs(U, V, time_idx=0, level_value=85000, stride=5, prj='PlateCarree'):
@@ -314,4 +325,71 @@ def plot_eof(eof_da, title=None, cmap='RdBu_r', prj='PlateCarree'):
 
     ax.set_title(title or eof_da.name)
     plt.tight_layout()
+    plt.show()
+
+def plot_eofs_panel(eof_da, pca, fig_title, num_modes=4, cmap='RdBu_r', prj='PlateCarree'):
+    """
+    Plot the first N EOFs in a panel with subplots and a shared colorbar at the bottom.
+
+    Parameters:
+    -----------
+    eof_da : list<xarray.DataArray>
+        List of DataArrays with an EOF mode dimension (e.g., shape = (mode, lat, lon))
+    pca : list<xarray.DataArray>
+        List of DataArrays with a PCA mode mode dimension (e.g., shape = (mode, lat, lon))
+    fig_title : text
+        Title for the figure
+    num_modes : int
+        Number of EOFs to plot (from mode 0 to num_modes-1).
+    cmap : str
+        Matplotlib colormap.
+    prj : str
+        Projection type: 'PlateCarree' or 'SouthPolarStereo'.
+    """
+    if prj == 'PlateCarree':
+        proj = ccrs.PlateCarree()
+    elif prj == 'SouthPolarStereo':
+        proj = ccrs.SouthPolarStereo()
+
+    ncols = 2
+    nrows = (num_modes + 1) // 2
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(12, 5 * nrows),
+                             subplot_kw={'projection': proj})
+
+    axes = axes.flat
+    vmin = min(float(eof.min().item()) for eof in eof_da)
+    vmax = max(float(eof.max().item()) for eof in eof_da)
+    im = None
+
+    for i in range(num_modes):
+        ax = axes[i]
+        ax.set_global()
+        ax.set_extent([-180, 180, -90, -45], crs=ccrs.PlateCarree())
+        ax.coastlines()
+        ax.add_feature(cfeature.BORDERS, linewidth=0.5)
+
+        eof = eof_da[i]
+        im = eof.plot(
+            ax=ax,
+            transform=ccrs.PlateCarree(),
+            cmap=cmap,
+            add_colorbar=False,
+            vmin=vmin, vmax=vmax
+        )
+
+        ax.set_title(f"EOF Mode {i+1} ({pca.explained_variance_ratio_[i]*100:.2f}% variance)")
+
+    # Remove unused axes
+    for j in range(num_modes, nrows * ncols):
+        fig.delaxes(axes[j])
+
+    # Shared colorbar at the bottom
+    cbar_ax = fig.add_axes([0.25, 0.08, 0.5, 0.02])  # [left, bottom, width, height]
+    cbar = fig.colorbar(im, cax=cbar_ax, orientation='horizontal')
+    cbar.set_label("EOF amplitude")
+    
+    fig.suptitle(fig_title, fontsize=14)
+    plt.tight_layout(rect=[0, 0.1, 1, 0.95])
+
+    plt.tight_layout(rect=[0, 0.1, 1, 1])  # Adjust for colorbar space
     plt.show()
