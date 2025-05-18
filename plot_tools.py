@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-def plot_field(field, title, time_idx, level_value, save_file=None, cmap='viridis', prj='PlateCarree'):
+def plot_field(field, title, time_idx, level_value, save_file=None, cmap='viridis', prj='SouthPolarStereo'):
     """Plot a horizontal map of a 3D field at given time and level.
 
     Parameters:
@@ -63,10 +63,10 @@ def plot_field(field, title, time_idx, level_value, save_file=None, cmap='viridi
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)
     
 
-def plot_wind_barbs(U, V, save_file=None, time_idx=0, level_value=85000, stride=5, prj='PlateCarree'):
+def plot_wind_barbs(U, V, save_file=None, time_idx=0, level_value=85000, stride=5, prj='SouthPolarStereo'):
     """
     Plot wind barbs from U and V wind components at a given time and pressure level.
 
@@ -139,9 +139,9 @@ def plot_wind_barbs(U, V, save_file=None, time_idx=0, level_value=85000, stride=
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)
 
-def plot_wind_streamlines(U, V, save_file=None, time_idx=0, level_value=85000, density=2, prj='PlateCarree'):
+def plot_wind_streamlines(U, V, save_file=None, time_idx=0, level_value=85000, density=2, prj='SouthPolarStereo'):
     """
     Plot streamlines from U and V wind components at a specific time and pressure level.
 
@@ -216,9 +216,9 @@ def plot_wind_streamlines(U, V, save_file=None, time_idx=0, level_value=85000, d
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)
 
-def plot_geopotential_contours(Z, save_file=None, time_idx=0, level_value=50000, cmap='viridis', prj='PlateCarree'):
+def plot_geopotential_contours(Z, save_file=None, time_idx=0, level_value=50000, cmap='viridis', prj='SouthPolarStereo'):
     """
     Plot geopotential height contours from CMIP5 data.
 
@@ -309,9 +309,9 @@ def plot_geopotential_contours(Z, save_file=None, time_idx=0, level_value=50000,
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)
 
-def plot_eof(eof_da, save_file=None, title=None, cmap='RdBu_r', prj='PlateCarree'):
+def plot_eof(eof_da, save_file=None, title=None, cmap='RdBu_r', prj='SouthPolarStereo'):
     """
     Plot streamlines from U and V wind components at a specific time and pressure level.
 
@@ -354,9 +354,9 @@ def plot_eof(eof_da, save_file=None, title=None, cmap='RdBu_r', prj='PlateCarree
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)
 
-def plot_eofs_panel(eof_da, pca, fig_title, save_file=None, num_modes=4, cmap='RdBu_r', prj='PlateCarree'):
+def plot_eofs_panel(eof_da, pca, fig_title, save_file=None, num_modes=4, cmap='RdBu_r', prj='SouthPolarStereo'):
     """
     Plot the first N EOFs in a panel with subplots and a shared colorbar at the bottom.
 
@@ -427,4 +427,4 @@ def plot_eofs_panel(eof_da, pca, fig_title, save_file=None, num_modes=4, cmap='R
     if save_file is None:
         plt.show()
     else:    
-        plt.savefil(save_file)
+        plt.savefig(save_file)

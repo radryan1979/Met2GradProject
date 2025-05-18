@@ -92,6 +92,8 @@ def calc_trend(da):
         dask='parallelized',  # Optional: if using dask
         output_dtypes=[float]
     )
+    
+    return trend
 
 def calc_psi(Z,lev,lat):
     """
@@ -247,7 +249,7 @@ def calc_q(laplacian_psi, QGPV_vertical, lat):
         
     return QGPV
 
-def calc_geostrophic_vort(lat, lon, Z):
+def calc_geostrophic_vort(lat, Z):
     """
     Calculates the geostrophic vorticity from geopotential height Z
     
@@ -255,9 +257,6 @@ def calc_geostrophic_vort(lat, lon, Z):
     -----------
     lat : xarray.DataArray
         DataArray of latitude coordiantes
-    
-    lon : xarray.DataArray
-        DataArray of longitude coordiantes
         
     Z : xarray.DataArray
         The geopotential height in meters
@@ -338,7 +337,7 @@ def compute_eofs_general(
     spatial_dims=('lat', 'lon'),
     level_dim=None,
     level_value=None,
-    n_modes=3,
+    n_modes=4,
     remove_mean=True
 ):
     """
